@@ -1,0 +1,53 @@
+<div class="transaction-overview-page">
+  <button class="back-button" (click)="goBack()">&larr; Back to account</button>
+
+  @if (loading) {
+    <p class="status-message">Loading transaction...</p>
+  }
+
+  @if (error) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <div class="error-title">Unable to load transaction</div>
+        <div class="error-message">{{ error }}</div>
+      </div>
+    </div>
+  }
+
+  @if (transaction && !loading) {
+    <div class="transaction-card">
+      <div class="tx-header">
+        <div class="tx-type-badge" [class.negative]="isDebit()">
+          {{ transaction.type }}
+        </div>
+        <div class="tx-amount-big" [class.negative]="isDebit()">
+          {{ isDebit() ? '-' : '+' }}{{ transaction.amount | number: '1.2-2' }} {{ transaction.currency }}
+        </div>
+      </div>
+
+      <div class="tx-details">
+        <div class="detail-row">
+          <span class="detail-label">Transaction ID</span>
+          <span class="detail-value">{{ transaction.id }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Date</span>
+          <span class="detail-value">{{ transaction.createdAt | date: 'medium' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Balance After</span>
+          <span class="detail-value">{{ transaction.balanceAfter | number: '1.2-2' }} {{ transaction.currency }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Description</span>
+          <span class="detail-value">{{ transaction.description || '-' }}</span>
+        </div>
+      </div>
+
+      <button class="export-button" (click)="exportToPdf()">
+        Export as PDF
+      </button>
+    </div>
+  }
+</div>

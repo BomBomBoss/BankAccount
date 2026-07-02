@@ -1,0 +1,74 @@
+<div class="account-overview-page">
+  <button class="back-button" (click)="goBack()">← Back to accounts</button>
+
+  @if (loadingAccount) {
+    <p class="status-message">Loading account...</p>
+  }
+
+  @if (error) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <div class="error-title">Something went wrong</div>
+        <div class="error-message">{{ error }}</div>
+      </div>
+    </div>
+  }
+
+  @if (account && !loadingAccount) {
+    <div class="balance-header">
+      <div class="balance-label">{{ account.currency }} Account</div>
+      <div class="balance-value">{{ account.balance | number: '1.2-2' }} {{ account.currency }}</div>
+    </div>
+  }
+
+  <div class="chart-section">
+    @if (loadingChart) {
+      <p class="status-message">Loading chart...</p>
+    }
+
+    @if (!loadingChart && chartData.labels && chartData.labels.length > 0) {
+      <div class="chart-container">
+        <canvas baseChart
+                [data]="chartData"
+                [options]="chartOptions"
+                type="line">
+        </canvas>
+      </div>
+    }
+
+    @if (!loadingChart && (!chartData.labels || chartData.labels.length === 0)) {
+      <p class="status-message">No balance history yet.</p>
+    }
+  </div>
+
+  <h2>Transaction History</h2>
+
+  @if (!loadingTransactions && transactions.length === 0) {
+    <p class="status-message">No transactions yet.</p>
+  }
+
+  <div class="transaction-list">
+    @for (tx of transactions; track tx.id) {
+      <div class="transaction-row" (click)="openTransaction(tx.id)">
+        <div class="tx-info">
+          <div class="tx-type">{{ tx.type }}</div>
+          <div class="tx-date">{{ tx.createdAt | date: 'medium' }}</div>
+        </div>
+        <div class="tx-amount" [class.negative]="tx.type === 'WITHDRAWAL' || tx.type === 'EXCHANGE_OUT'">
+          {{ tx.type === 'WITHDRAWAL' || tx.type === 'EXCHANGE_OUT' ? '-' : '+' }}{{ tx.amount | number: '1.2-2' }} {{ tx.currency }}
+        </div>
+      </div>
+    }
+
+    <div #scrollAnchor class="scroll-anchor"></div>
+
+    @if (loadingTransactions) {
+      <p class="status-message loading-more">Loading more transactions...</p>
+    }
+
+    @if (isLastPage && transactions.length > 0) {
+      <p class="status-message end-of-list">No more transactions</p>
+    }
+  </div>
+</div>
